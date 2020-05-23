@@ -9,10 +9,12 @@ public class CameraController : MonoBehaviour
     public StateManager sm;//主角的状态组件
 
     [Header("----- Related Data -----")]
-    public float followSpeed = 0.015f;
+    public float followSpeed = 0.02f;
     public float minCamPosX = -10000;
     public float maxCamPosX = 10000;
     public float stillOffset = 2;
+
+    public float smoothDampVelocity;
 
 
     private void Awake()
@@ -44,16 +46,18 @@ public class CameraController : MonoBehaviour
     {
         float pPosX = hero.transform.position.x;//主角 x轴方向 时实坐标值
         float cPosX = transform.position.x;//相机 x轴方向 时实坐标值
-        if (Mathf.Abs(hc.rigid.velocity.x) > 0.1f)//主角在移动
+        if (Mathf.Abs(hc.rigid.velocity.x) > 0.05f)//主角在移动
         {
             if (Mathf.Abs(pPosX - cPosX) > stillOffset)
             {
-                transform.position = new Vector3(Mathf.Lerp(cPosX, pPosX, 0.04f), transform.position.y, transform.position.z);
+                //transform.position = new Vector3(Mathf.Lerp(cPosX, pPosX, 0.04f), transform.position.y, transform.position.z);
+                transform.position = new Vector3(Mathf.SmoothDamp(cPosX, pPosX, ref smoothDampVelocity,0.8f), transform.position.y, transform.position.z);
+
             }
             float realPosX = Mathf.Clamp(transform.position.x, minCamPosX, maxCamPosX);//相机X轴方向 限制移动区间，防止超过背景边界
             transform.position = new Vector3(realPosX, transform.position.y, transform.position.z);
         }
-        else if (Mathf.Abs(hc.rigid.velocity.x) < 0.1f && Mathf.Abs(hc.rigid.velocity.y) < 0.1)//静止
+        else if (Mathf.Abs(hc.rigid.velocity.x) < 0.05f && Mathf.Abs(hc.rigid.velocity.y) < 0.05)//静止
         {
 
             if (sm.isFacingRight)//面向右边
