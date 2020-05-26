@@ -17,6 +17,7 @@ public class StateManager : MonoBehaviour
     [Header("----- First Order State Flags -----")]
     public bool isJump;
     public bool isGround;
+    public bool isWall;
     public bool isDash;
     public bool isHit;
     public bool isAttack;
@@ -58,6 +59,7 @@ public class StateManager : MonoBehaviour
     public void StateUpdate()
     {
         UpdateIsGroundState();
+        UpdateIsWallState();
         isJump = hc.CheckState("jump");
         isDefense = hc.CheckState("defense");
         isDefenseHit = hc.CheckState("isDefenseHit");
@@ -90,7 +92,12 @@ public class StateManager : MonoBehaviour
     /// </summary>
     public void UpdateIsGroundState()
     {
-        isGround = Physics.Raycast(this.transform.position, new Vector3(0, -1, 0), 0.5f, LayerMask.GetMask("ground"));
+        isGround = Physics.Raycast(this.transform.position, new Vector3(0, -1, 0), 0.6f, LayerMask.GetMask("ground"));
+    }
+
+    public void UpdateIsWallState()
+    {
+        isWall = Physics.Raycast(this.transform.position, new Vector3(-1, 0, 0), 1f, LayerMask.GetMask("ground"))|| Physics.Raycast(this.transform.position, new Vector3(1, 0, 0), 1f, LayerMask.GetMask("ground"));
     }
 
     private void OnTriggerEnter(Collider other)

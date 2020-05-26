@@ -82,7 +82,14 @@ public class HeroControl : MonoBehaviour
     /// </summary>
     private void SetMoveSpeed()
     {
-        rigid.velocity = new Vector3(movingVect.x, rigid.velocity.y, rigid.velocity.z)+thrustVelocity;//实时改变刚体速度
+        if (!CheckState("dash"))
+        {
+            rigid.velocity = new Vector3(movingVect.x, rigid.velocity.y, rigid.velocity.z) + thrustVelocity;//实时改变刚体速度
+        }
+        else
+        {
+            rigid.velocity = new Vector3(movingVect.x, 0 , rigid.velocity.z) + thrustVelocity;//实时改变刚体速度
+        }
         thrustVelocity = Vector3.zero;
     }
 
@@ -181,6 +188,7 @@ public class HeroControl : MonoBehaviour
             canHit = false;
         }
         anim.SetBool("IsGround", sm.isGround);//更新isGround状态
+        anim.SetBool("IsWall", sm.isWall);//更新isWall状态
     }
 
 
@@ -190,17 +198,36 @@ public class HeroControl : MonoBehaviour
 
     public void OnIdleEnter()
     {
-        rigid.velocity = new Vector3(movingVect.x, 0, 0);
+        rigid.velocity = new Vector3(movingVect.x, rigid.velocity.y, 0);
+        ClearSignals("Jump");
+    }
+    public void OnIdleExit()
+    {
     }
 
     public void OnWalkEnter()
     {
-        rigid.velocity = new Vector3(movingVect.x, 0, 0);
+        rigid.velocity = new Vector3(movingVect.x, rigid.velocity.y, 0);
+        ClearSignals("Jump");
     }
 
     public void OnJumpEnter()
     {
         thrustVelocity = new Vector3(0, jumpForce , 0);
+    }
+
+    public void OnJump2Enter()
+    {
+        thrustVelocity = new Vector3(0, jumpForce*0.8f, 0);
+    }
+
+    public void OnJump2Update()
+    {
+
+    }
+
+    public void OnJumpUpdate()
+    {
     }
 
     public void OnDashUpdate()
@@ -220,6 +247,14 @@ public class HeroControl : MonoBehaviour
     public void OnDashExit()
     {
         inputEnable = true;
+    }
+
+    public void OnAttackEnter()
+    {
+    }
+
+    public void OnAttackExit()
+    {
     }
 
     public void AttackColOn()
